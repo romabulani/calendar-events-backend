@@ -9,6 +9,7 @@ import { getGoogleAuthUrl, googleAuthCallback, resetGoogleSyncFlag } from "./con
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import fs from "fs";
+const options = { customCssUrl: '../public/swagger-ui.css',};
 
 dotenv.config();
 const allowedOrigins = [process.env.FRONTEND_URL];
@@ -34,7 +35,7 @@ const swaggerDocument = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'public', 'swagger-output.json'), 'utf-8')
 );
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", express.static('node_modules/swagger-ui-dist'), swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 app.get("/", (req, res) => res.send("Welcome to Calendar Events"));
 app.post("/signup", signupHandler);
