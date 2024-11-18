@@ -1,0 +1,43 @@
+import express from "express";
+import dotenv from "dotenv";
+import { connectToDatabase } from "./database";
+import { loginHandler, signupHandler } from "./controllers/auth.controller";
+import verifyAuth from "./middlewares/verifyAuth";
+import { createEvent, getEvents } from "./controllers/event.controller";
+import cors from "cors";
+import { getGoogleAuthUrl, googleAuthCallback, resetGoogleSyncFlag } from "./controllers/googleAuth.controller";
+
+dotenv.config();
+const allowedOrigins = [process.env.FRONTEND_URL];
+
+const app = express();
+app.use(express.json());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  })
+);
+
+connectToDatabase();
+
+app.get("/", (req, res) => res.send("Welcome to Calendar Events"));
+app.post("/signup", signupHandler);
+app.post("/login", loginHandler);
+app.post("/events", verifyAuth, createEvent);
+app.get("/events", verifyAuth, getEvents);
+app.get("/google-auth-url", getGoogleAuthUrl);
+app.get("/google-auth-callback", googleAuthCallback);
+app.post("/reset-google-sync-flag", verifyAuth, resetGoogleSyncFlag);
+
+
+
+const PORT = process.env.PORT ?? 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
