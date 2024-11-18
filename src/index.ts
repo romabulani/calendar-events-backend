@@ -5,11 +5,20 @@ import { loginHandler, signupHandler } from "./controllers/auth.controller";
 import verifyAuth from "./middlewares/verifyAuth";
 import { createEvent, getEvents } from "./controllers/event.controller";
 import cors from "cors";
-import { getGoogleAuthUrl, googleAuthCallback, resetGoogleSyncFlag } from "./controllers/googleAuth.controller";
+import {
+  getGoogleAuthUrl,
+  googleAuthCallback,
+  resetGoogleSyncFlag,
+} from "./controllers/googleAuth.controller";
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import fs from "fs";
-const options = { customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css'};
+const options = {
+  customCss:
+    ".swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }",
+  customCssUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
+};
 
 dotenv.config();
 const allowedOrigins = [process.env.FRONTEND_URL];
@@ -22,20 +31,27 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
 );
 
 connectToDatabase();
 const swaggerDocument = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'public', 'swagger-output.json'), 'utf-8')
+  fs.readFileSync(
+    path.join(__dirname, "..", "public", "swagger-output.json"),
+    "utf-8"
+  )
 );
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, options)
+);
 
 app.get("/", (req, res) => res.send("Welcome to Calendar Events"));
 app.post("/signup", signupHandler);
