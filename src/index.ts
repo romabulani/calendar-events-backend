@@ -7,7 +7,8 @@ import { createEvent, getEvents } from "./controllers/event.controller";
 import cors from "cors";
 import { getGoogleAuthUrl, googleAuthCallback, resetGoogleSyncFlag } from "./controllers/googleAuth.controller";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocs from "./swagger-output.json";
+import path from "path";
+import fs from "fs";
 
 dotenv.config();
 const allowedOrigins = [process.env.FRONTEND_URL];
@@ -29,7 +30,11 @@ app.use(
 );
 
 connectToDatabase();
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '..', 'public', 'swagger-output.json'), 'utf-8')
+);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => res.send("Welcome to Calendar Events"));
 app.post("/signup", signupHandler);
