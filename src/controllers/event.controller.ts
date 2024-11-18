@@ -47,15 +47,17 @@ export const getEvents = async (req: Request, res: Response) => {
   const { email, tag, limit = 50, sort = "asc" } = req.query;
   const filter: Record<string, any> = {};
   let events: any[] = [];
+  let googleError = false;
   try {
+    let user;
     if (email) {
-      const user = await User.findOne({ email });
+      user = await User.findOne({ email });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       filter.userId = user._id;
     } else if (req?.user?.id) {
-      const user = await User.findOne({ _id: req.user.id });
+      user = await User.findOne({ _id: req.user.id });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -69,9 +71,7 @@ export const getEvents = async (req: Request, res: Response) => {
           events = events.concat(googleEvents);
         } catch (error) {
           console.error("Error fetching Google events:", error);
-          return res
-            .status(200)
-            .json({ events, message: "Failed to fetch Google Calendar events." });
+          googleError = true;
         }
       } else {
         filter.tag = { $ne: "google-event" };
@@ -89,7 +89,15 @@ export const getEvents = async (req: Request, res: Response) => {
       .limit(Number(limit));
     events = events.concat(dbEvents);
 
-    res.status(200).json({ events });
+    res
+      .status(200)
+      .json({
+        events,
+        message:
+          user?.googleSyncFlag && googleError && !email
+            ? "Failed to fetch Google Calendar events."
+            : "",
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -97,4 +105,3 @@ export const getEvents = async (req: Request, res: Response) => {
     });
   }
 };
-
