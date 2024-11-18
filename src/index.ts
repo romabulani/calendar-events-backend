@@ -21,7 +21,7 @@ const options = {
 };
 
 dotenv.config();
-const allowedOrigins = [process.env.FRONTEND_URL];
+const allowedOrigins = [process.env.FRONTEND_URL, "https://calendarevents-backend.vercel.app"];
 
 const app = express();
 app.use(express.json());
