@@ -70,8 +70,8 @@ export const getEvents = async (req: Request, res: Response) => {
         } catch (error) {
           console.error("Error fetching Google events:", error);
           return res
-            .status(500)
-            .json({ message: "Failed to fetch Google Calendar events." });
+            .status(200)
+            .json({ events, message: "Failed to fetch Google Calendar events." });
         }
       } else {
         filter.tag = { $ne: "google-event" };
@@ -89,7 +89,7 @@ export const getEvents = async (req: Request, res: Response) => {
       .limit(Number(limit));
     events = events.concat(dbEvents);
 
-    res.status(200).json(events);
+    res.status(200).json({ events });
   } catch (error) {
     console.error(error);
     res.status(500).json({

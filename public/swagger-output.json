@@ -126,6 +126,46 @@
           }
         ]
       }
+    },
+    "/google-auth-url": {
+      "get": {
+        "description": "Retrieve Google authentication URL",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/google-auth-callback": {
+      "get": {
+        "description": "Handle Google authentication callback",
+        "parameters": [
+          { "name": "code", "in": "query", "type": "string" }
+        ],
+        "responses": {
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/reset-google-sync-flag": {
+      "post": {
+        "description": "Reset Google sync flag for the authenticated user",
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   }
 }
