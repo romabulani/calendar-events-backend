@@ -6,6 +6,8 @@ import verifyAuth from "./middlewares/verifyAuth";
 import { createEvent, getEvents } from "./controllers/event.controller";
 import cors from "cors";
 import { getGoogleAuthUrl, googleAuthCallback, resetGoogleSyncFlag } from "./controllers/googleAuth.controller";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocs from "./swagger-output.json";
 
 dotenv.config();
 const allowedOrigins = [process.env.FRONTEND_URL];
@@ -27,6 +29,7 @@ app.use(
 );
 
 connectToDatabase();
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get("/", (req, res) => res.send("Welcome to Calendar Events"));
 app.post("/signup", signupHandler);
@@ -36,7 +39,5 @@ app.get("/events", verifyAuth, getEvents);
 app.get("/google-auth-url", getGoogleAuthUrl);
 app.get("/google-auth-callback", googleAuthCallback);
 app.post("/reset-google-sync-flag", verifyAuth, resetGoogleSyncFlag);
-
-
 
 export default app;
