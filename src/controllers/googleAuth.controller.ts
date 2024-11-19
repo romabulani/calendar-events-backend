@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { google } from "googleapis";
 import { IUser, User } from "../models/user.model";
 import { Event } from "../models/event.model";
+import { FRONTEND_URL } from "constants.ts";
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -38,9 +39,9 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.redirect(`${process.env.FRONTEND_URL}?status=success`);
+    res.redirect(`${FRONTEND_URL}?status=success`);
   } catch (error) {
-    res.redirect(`${process.env.FRONTEND_URL}?status=failure`);
+    res.redirect(`${FRONTEND_URL}?status=failure`);
     console.error("Error retrieving access token or fetching events:", error);
     res.status(500).send("Failed to retrieve access token or fetch events.");
   }

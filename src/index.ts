@@ -13,6 +13,7 @@ import {
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import fs from "fs";
+import { FRONTEND_URL } from "constants.ts";
 const options = {
   customCss:
     ".swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }",
@@ -21,7 +22,7 @@ const options = {
 };
 
 dotenv.config();
-const allowedOrigins = [process.env.FRONTEND_URL, "https://calendarevents-backend.vercel.app"];
+const allowedOrigins = [FRONTEND_URL, "https://calendarevents-backend.vercel.app"];
 
 const app = express();
 app.use(express.json());
