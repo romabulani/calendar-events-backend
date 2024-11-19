@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { google } from "googleapis";
 import { IUser, User } from "../models/user.model";
 import { Event } from "../models/event.model";
-import { FRONTEND_URL } from "constants.ts";
+import { FRONTEND_URL } from "../constants";
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
