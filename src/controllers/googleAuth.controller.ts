@@ -75,7 +75,7 @@ export const getGoogleCalendarEvents = async (
       }
 
       nextPageToken = eventsResponse.data.nextPageToken;
-    } while (nextPageToken); 
+    } while (nextPageToken);
 
     if (events.length === 0) {
       return { message: "No upcoming events found." };
@@ -97,32 +97,24 @@ export const syncGoogleEventsToDB = async (
 ) => {
   googleEvents.forEach(async (event) => {
     const existingEvent = await Event.findOne({ googleEventId: event.id });
-    const startDate = new Date(event.start.dateTime);
-    const endDate = new Date(event.end.dateTime);
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const startDateInLocal = startDate.toLocaleString("en-US", {
-      timeZone: userTimeZone,
-      hour12: false,
-    });
-    const endDateInLocal = endDate.toLocaleString("en-US", {
-      timeZone: userTimeZone,
-      hour12: false,
-    });
-
-    const duration = Math.floor(
-      (endDate.getTime() - startDate.getTime()) / 60000
-    );
-    if (!existingEvent && !isNaN(duration)) {
-      await Event.create({
-        googleEventId: event.id,
-        name: event.summary,
-        datetime: event.start.dateTime.split("+")[0],
-        userId: user._id,
-        tag: "google-event",
-        duration: duration,
-        endTime: event.end.dateTime.split("+")[0],
-      });
-    }
+    try {
+      const startDate = new Date(event.start.dateTime);
+      const endDate = new Date(event.end.dateTime);
+      const duration = Math.floor(
+        (new Date(endDate).getTime() - new Date(startDate).getTime()) / 60000
+      );
+      if (!existingEvent && !isNaN(duration)) {
+        await Event.create({
+          googleEventId: event.id,
+          name: event.summary,
+          datetime: new Date(event.start.dateTime).toISOString(),
+          userId: user._id,
+          tag: "google-event",
+          duration: duration,
+          endTime: new Date(event.end.dateTime).toISOString(),
+        });
+      }
+    } catch (e) {}
   });
 };
 
@@ -132,7 +124,7 @@ export const resetGoogleSyncFlag = async (req: Request, res: Response) => {
     const filter: Record<string, any> = {};
     let events: any[] = [];
     filter.userId = userId;
-    filter.tag = { $ne: "google-event" }
+    filter.tag = { $ne: "google-event" };
     const user = await User.findOneAndUpdate(
       { _id: userId },
       { googleSyncFlag: false },
@@ -142,7 +134,7 @@ export const resetGoogleSyncFlag = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-     events = await Event.find(filter);
+    events = await Event.find(filter);
     res
       .status(200)
       .json({ events, message: "Google sync flag reset successfully", user });
